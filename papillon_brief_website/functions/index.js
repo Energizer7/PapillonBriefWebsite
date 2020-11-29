@@ -7,13 +7,22 @@
 // });
 const functions = require('firebase-functions');
 const nodemailer = require("nodemailer");
-
+const gmailEmail = 'adhisuabeba@gmail.com';
+const gmailPassword = 'dohmhyyzppafkyqn';
 //実際の機能
-exports.sendMail = functions.https.onCall(async function(text, context) {
-  const gmailEmail = 'so1rou.k@gmail.com';
-  const gmailPassword = 'K.so1rou';
-  const adminEmail = 'peniskokoro@gmail.com';
-
+exports.sendMail = functions.https.onCall(async function(data, context) {
+  let text = data.company + "\n" + data.first + " " + data.last + "様\n";
+if(data.inquiry == "question"){
+  text += 
+    "ご質問ありがとうございます。"
+}else if(data.inquiry == "idea"){
+  text +=
+    "ご意見ありがとうございます。"
+}else{
+  text +=
+    "申し訳ございません、エラーが発生しました。\n"
+    +"お問い合わせ内容を確認の上もう一度送信してください。"
+}
   //SMTPサーバーの設定
 const mailTransport = nodemailer.createTransport({
   service: "gmail",
@@ -25,7 +34,7 @@ const mailTransport = nodemailer.createTransport({
 //送信元、送信先、題名、内容を１つの変数にまとめる
   let adminMail = {
     from: gmailEmail,
-    to: adminEmail,
+    to: data.email,
     subject: "ホームページお問い合わせ",
     text: text
   };

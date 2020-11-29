@@ -72,22 +72,22 @@
         <div class="forms">
           <div class="topic">
             会社名<br>
-            <input type="text" placeholder="例:株式会社Papillon" /><br>
+            <input type="text" placeholder="例:株式会社Papillon" id="company"/><br>
           </div>
           <div class="topic">
             お名前<br>
-            <input type="text" placeholder="姓" class="shortInput" /><br>
-            <input type="text" placeholder="名" class="shortInput" /><br>
+            <input type="text" placeholder="姓" class="shortInput" id="firstname"/><br>
+            <input type="text" placeholder="名" class="shortInput" id="lastname"/><br>
           </div>
           <div class="topic">
             メールアドレス<br>
-            <input type="text" placeholder="例:papillon@domain.com" />
+            <input type="text" placeholder="例:papillon@domain.com" id="email"/>
           </div>
           <div class="topic">
             お問い合わせ内容<br>
             <div class="selectWrap">
-              <select name="inquiry">
-                <option selected="true" disabled="disabled">選択してください...</option>
+              <select name="inquiry" id="inquiry">
+                <option selected="true" disabled="disabled" value="null">選択してください...</option>
                 <option value="question">質問</option>
                 <option value="idea">意見</option>
               </select>
@@ -185,9 +185,35 @@ export default {
   },
   methods: {
     sendMail() {
+      let text=[];
+      let company = document.getElementById("company").value
+      let email = document.getElementById("email").value;
+      let first = document.getElementById("firstname").value;
+      let last = document.getElementById("lastname").value;
+      let inquiry = document.getElementById("inquiry").value;
+      if(!company){
+        text.push("会社名");
+      }
+      if(!first){
+        text.push("姓");
+      }
+      if(!last){
+        text.push("名");
+      }
+      if(email.indexOf('@') == -1){
+        text.push("メールアドレス");
+      }
+      if(inquiry == "null"){
+        text.push("お問い合わせ内容");
+      }
+      if(text != ""){
+        alert(text.join(",")+" を入力してください");
+        return
+      }
       const send = firebase.functions().httpsCallable("sendMail");
-      send("test")
+      send({email: email, first: first, last: last, inquiry: inquiry, company: company})
       .then(function(data) {
+        console.log(data)
         alert("送信しました。");
       })
       .catch(function(error) {
